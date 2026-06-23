@@ -1,0 +1,4 @@
+{
+  "main": "dist-electron/main.js",
+  "homepage": "http://localhost:5173"
+}
