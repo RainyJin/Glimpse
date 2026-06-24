@@ -1,34 +1,49 @@
 const esbuild = require("esbuild");
 const fs = require("fs");
 
-// Ensure dist-electron folder exists
-if (!fs.existsSync("dist-electron")) {
-  fs.mkdirSync("dist-electron", { recursive: true });
+// Clean dist-electron folder first
+if (fs.existsSync("dist-electron")) {
+  fs.rmSync("dist-electron", { recursive: true, force: true });
 }
 
-// Build main.ts (ESM)
+fs.mkdirSync("dist-electron", { recursive: true });
+
+// Build main.ts
 esbuild.buildSync({
   entryPoints: ["src/electron/main.ts"],
   bundle: true,
   platform: "node",
   target: "node20",
-  format: "esm", // ← ESM for main
+  format: "esm",
   outdir: "dist-electron",
-  external: ["electron", "fs-extra", "better-sqlite3", "chokidar"],
-  loader: { ".ts": "ts" },
+  external: [
+    "electron",
+    "fs-extra",
+    "sqlite3",
+    "sharp",
+    "better-sqlite3",
+    "chokidar",
+  ],
+  loader: {
+    ".ts": "ts",
+  },
 });
 
-// Build preload.ts (CommonJS)
+// Build preload.ts as CommonJS
 esbuild.buildSync({
   entryPoints: ["src/electron/preload.ts"],
   bundle: true,
   platform: "node",
   target: "node20",
-  format: "cjs", // ← CJS for preload
+  format: "cjs",
   outdir: "dist-electron",
-  outExtension: { ".js": ".cjs" }, // ← Name it .cjs
+  outExtension: {
+    ".js": ".cjs",
+  },
   external: ["electron"],
-  loader: { ".ts": "ts" },
+  loader: {
+    ".ts": "ts",
+  },
 });
 
 console.log("✅ Electron files compiled");
